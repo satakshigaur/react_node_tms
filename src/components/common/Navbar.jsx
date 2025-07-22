@@ -8,7 +8,7 @@ const Navbar = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const hideProfileRoutes = ["/", "/login", "/signup"];
+  const hideProfileRoutes = ["/", "/login", "/signup", "/landing"]; // Added landing page to hide profile routes
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [taskListOpen, setTaskListOpen] = useState(false);
@@ -56,8 +56,8 @@ const Navbar = () => {
 
       // Remove the correct profile from storage
       localStorage.removeItem(isAdminPortal ? "adminProfile" : "userProfile");
-      
-      navigate("/");
+      // Redirecting to landing page after logout
+      navigate("/landing");
     } catch (err) {
       console.error("Logout failed:", err);
     }

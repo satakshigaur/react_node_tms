@@ -100,8 +100,9 @@ function App() {
             
             <main className="flex-grow">
               <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={<Landing />} />
+                {/* User should be sent to Login Page first instead of landing page */}
+                <Route path="/" element={<Navigate to="/login" replace />} />
+                <Route path="/landing" element={<Landing />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -215,8 +216,8 @@ function App() {
                   } 
                 />
                 
-                {/* Fallback Route - Redirect to landing page */}
-                <Route path="*" element={<Navigate to="/" replace />} />
+                {/* Fallback Route - Redirect to login page */}
+                <Route path="*" element={<Navigate to="/login" replace />} />
               </Routes>
             </main>
             
