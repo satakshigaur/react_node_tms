@@ -9,6 +9,7 @@ const Sidebar = () => {
   const menuItems = [
     { path: "/admin/dashboard", label: "Dashboard", icon: <FaChartPie /> },
     { path: "/admin/manage-users", label: "Manage Users", icon: <FaUsers /> },
+    { path: "/admin/user-logs", label: "User Logs", icon: <FaUsers /> },
     { path: "/admin/manage-tasks", label: "Manage Tasks", icon: <FaTasks /> },
     { path: "/admin/settings", label: "Settings", icon: <FaCog /> },
   ];
