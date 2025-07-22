@@ -17,6 +17,18 @@ const UserDashboard = () => {
     Completed: [],
   });
 
+  const [filteredTasks, setFilteredTasks] = useState({
+    "To Do": [],
+    "In Progress": [],
+    Completed: [],
+  });
+
+  const [activeFilters, setActiveFilters] = useState({
+    "To Do": true,
+    "In Progress": true,
+    "Completed": true,
+  });
+
   const [notes, setNotes] = useState(localStorage.getItem("notes") || "");
   const audioRef = useRef(new Audio(notificationSound));
 
@@ -32,9 +44,49 @@ const UserDashboard = () => {
       "In Progress": storedTasks.filter((task) => task.progress > 40 && task.progress <= 80),
       Completed: storedTasks.filter((task) => task.progress > 80),
     };
+    // Adding sample tasks for testing - to remove later
+    categorizedTasks["In Progress"].push({
+        "id": 21,
+        "title": "Land on Login Page",
+        "description": "Land on login page instead of landing page to force user to login",
+        "priority": "Medium",
+        "deadline": "2025-07-22",
+        "progress": 50,
+        "assignedTo": "Unknown User",
+        "status": "complete",
+        "updatedAt": "2025-07-22T09:51:13.446Z"
+    });
+    categorizedTasks["Completed"].push({
+        "id": 2,
+        "title": "Add tasks filter option",
+        "description": "Add tasks filter option",
+        "priority": "High",
+        "deadline": "2025-07-22",
+        "progress": 0,
+        "assignedTo": "Unknown User"
+    });
+
     setTasks(categorizedTasks);
+    setFilteredTasks(categorizedTasks);
     checkDeadlines(storedTasks);
   }, []);
+
+  // Filter tasks based on active filters
+  useEffect(() => {
+    const filtered = {
+      "To Do": activeFilters["To Do"] ? tasks["To Do"] : [],
+      "In Progress": activeFilters["In Progress"] ? tasks["In Progress"] : [],
+      "Completed": activeFilters["Completed"] ? tasks["Completed"] : [],
+    };
+    setFilteredTasks(filtered);
+  }, [tasks, activeFilters]);
+
+  const toggleFilter = (filterName) => {
+    setActiveFilters(prev => ({
+      ...prev,
+      [filterName]: !prev[filterName]
+    }));
+  };
 
   useEffect(() => {
     localStorage.setItem("notes", notes);
@@ -95,9 +147,9 @@ const UserDashboard = () => {
       {
         label: "Number of Tasks",
         data: [
-          tasks["To Do"].length,
-          tasks["In Progress"].length,
-          tasks.Completed.length,
+          filteredTasks["To Do"].length,
+          filteredTasks["In Progress"].length,
+          filteredTasks.Completed.length,
         ],
         backgroundColor: ["#FF6384", "#FFCE56", "#36A2EB"],
       },
@@ -116,17 +168,56 @@ const UserDashboard = () => {
 
         {/* Kanban Board */}
         <div className="glassmorphism p-4 rounded-xl shadow-lg bg-gradient-to-br from-white/30 to-white/10 backdrop-blur-lg border border-white/20">
+          {/* Task Filter Toggle Buttons */}
+          <div className="mb-6">
+            <label className="block mb-3 text-lg font-semibold text-gray-800">Filter Tasks:</label>
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={() => toggleFilter("To Do")}
+                className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                  activeFilters["To Do"]
+                    ? "bg-red-500 text-white shadow-lg transform scale-105"
+                    : "bg-gray-300 text-gray-600 hover:bg-gray-400"
+                }`}
+              >
+                To Do ({tasks["To Do"].length})
+              </button>
+              <button
+                onClick={() => toggleFilter("In Progress")}
+                className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                  activeFilters["In Progress"]
+                    ? "bg-yellow-500 text-white shadow-lg transform scale-105"
+                    : "bg-gray-300 text-gray-600 hover:bg-gray-400"
+                }`}
+              >
+                In Progress ({tasks["In Progress"].length})
+              </button>
+              <button
+                onClick={() => toggleFilter("Completed")}
+                className={`px-4 py-2 rounded-lg font-medium transition-all  ${
+                  activeFilters["Completed"]
+                    ? "bg-green-500 text-white shadow-lg transform scale-105"
+                    : "bg-gray-300 text-gray-600 hover:bg-gray-400"
+                }`}
+              >
+                Completed ({tasks["Completed"].length})
+              </button>
+            </div>
+          </div>
+          
           <DndContext collisionDetection={closestCorners} onDragEnd={handleDragEnd}>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {Object.keys(tasks).map((columnKey) => (
+              {Object.keys(filteredTasks).map((columnKey) => {
+                if(!filteredTasks[columnKey].length) return null;
+                return (
                 <Column key={columnKey} title={columnKey} id={columnKey} className="w-[280px]">
-                  <SortableContext items={tasks[columnKey].map((task) => task.id)} strategy={verticalListSortingStrategy}>
-                    {tasks[columnKey].map((task) => (
+                  <SortableContext items={filteredTasks[columnKey].map((task) => task.id)} strategy={verticalListSortingStrategy}>
+                    {filteredTasks[columnKey].map((task) => (
                       <SortableItem key={task.id} id={task.id} task={task} />
                     ))}
                   </SortableContext>
-                </Column>
-              ))}
+                </Column> )
+            })}
             </div>
           </DndContext>
         </div>
